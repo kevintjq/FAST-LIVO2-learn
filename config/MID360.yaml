@@ -1,0 +1,158 @@
+common:
+  img_topic: "/usb_cam/image_raw"
+  lid_topic: "/livox/lidar"
+  imu_topic: "/livox/imu"
+  img_en: 1
+  lidar_en: 1
+  ros_driver_bug_fix: false
+
+extrin_calib:
+  extrinsic_T: [-0.011, -0.02329, 0.04412]
+  extrinsic_R: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+
+  # Rcl: [-0.00395831,-0.999653,0.0260368,
+  #       0.000729266,-0.0260399,-0.999661,
+  #       0.999992,-0.00393798,0.000832087] 
+  # Pcl: [-0.0474452, -0.0836841,-0.0631942]
+  Rcl: [  0.002608,  -0.999867,   0.016095,
+        0.381739,  -0.013880,  -0.924166,
+        0.924267,   0.008555,   0.381652]
+  Pcl: [  0.070686,  -0.143202,   0.004328]
+# time_offset: 
+#   imu_time_offset: 0.0
+#   img_time_offset: 0.1
+#   exposure_time_init: 0.0
+
+# preprocess:
+#   point_filter_num: 1
+#   filter_size_surf: 0.1
+#   lidar_type: 1 # Livox Avia LiDAR
+#   scan_line: 4
+#   blind: 0.3
+
+# vio:
+#   max_iterations: 5
+#   outlier_threshold: 1000 # 78 100 156 #100 200 500 700 infinite
+#   img_point_cov: 100 # 100 1000 
+#   patch_size: 8
+#   patch_pyrimid_level: 4
+#   normal_en: true
+#   raycast_en: false
+#   inverse_composition_en: false
+#   exposure_estimate_en: true
+#   inv_expo_cov: 0.1
+
+# imu:
+#   imu_en: true
+#   imu_int_frame: 30
+#   acc_cov: 0.5 # 0.2
+#   gyr_cov: 0.3 # 0.5
+#   b_acc_cov: 0.0001 # 0.1
+#   b_gyr_cov: 0.0001 # 0.1
+
+# lio:
+#   max_iterations: 5
+#   dept_err: 0.02
+#   beam_err: 0.05
+#   min_eigen_value: 0.0025 # 0.005
+#   voxel_size: 0.5
+#   max_layer: 2
+#   max_points_num: 50
+#   layer_init_num: [5, 5, 5, 5, 5]
+
+# local_map:  
+#   map_sliding_en: false
+#   half_map_size: 100
+#   sliding_thresh: 8
+
+# uav:
+#   imu_rate_odom: false
+#   gravity_align_en: false
+
+# publish:
+#   dense_map_en: true
+#   pub_effect_point_en: false 
+#   pub_plane_en: false
+#   pub_scan_num: 1
+#   blind_rgb_points: 0.0
+
+# evo:
+#   seq_name: "CBD_Building_01"
+#   pose_output_en: false
+
+# pcd_save:
+#   pcd_save_en: false
+#   colmap_output_en: false # need to set interval = -1
+#   filter_size_pcd: 0.15
+#   interval: -1
+#   # how many LiDAR frames saved in each pcd file;
+#   # -1 : all frames will be saved in ONE pcd file, may lead to memory crash when having too much frames.
+time_offset:      #时间同步部分，建议不要改
+  imu_time_offset: 0.0
+  img_time_offset: 0.1
+  exposure_time_init: 0.0
+
+preprocess:
+  point_filter_num: 1    #点云预处理滤波次数，建议不要改
+  filter_size_surf: 0.1  #点云体素滤波大小，影响点云稠密度与处理速度 ，增大会丢失细节，不怎么需要改
+  lidar_type: 1 # Livox Avia LiDAR
+  scan_line: 4  #如果是mid360则设置为4，不要改！
+  blind: 0.5    #雷达盲区距离，小于该距离的点被丢弃
+
+vio:
+  max_iterations: 5    #光视觉里程计最大迭代次数，增大可能提升精度但会降低速度
+  outlier_threshold: 1000 # 78 100 156 #100 200 500 700 infinite
+  img_point_cov: 100 # 100 1000 越大表示不太信任图像测量
+  patch_size: 8    #更大的 patch/能提高匹配稳定性与稠密性
+  patch_pyrimid_level: 4
+  normal_en: true  #是否使用法线辅助，建议开启
+  raycast_en: true #是否使用光线投射辅助，建议开启
+  inverse_composition_en: false #是否使用逆向合成，建议关闭，开启的话，位置更新会变慢
+  exposure_estimate_en: true  #是否估计曝光时间，建议开启
+  inv_expo_cov: 0.1  #曝光时间协方差，越大表示不太信任图像测量
+
+imu:                 #IMU参数几乎不需要改
+  imu_en: true       #是否使用IMU，建议开启
+  imu_int_frame: 30  #每隔多少帧进行一次IMU预积分，建议不用改
+  acc_cov: 0.5 # 0.2
+  gyr_cov: 0.3 # 0.5
+  b_acc_cov: 0.0001 # 0.1
+  b_gyr_cov: 0.0001 # 0.1
+
+lio:
+  max_iterations: 5      #激光里程计最大迭代次数，增大可能提升精度但会降低速度
+  dept_err: 0.01
+  beam_err: 0.10
+  min_eigen_value: 0.005 # 0.005   #点云平面判定阈值，减小会有更多特征点参与，但噪声可能增加
+  voxel_size: 0.5  #体素大小（m），是最直接影响地图分辨率的参数
+  max_layer: 2          #体素最大层级，一般不需要改
+  max_points_num: 50    #每个体素最大点数，防止内存爆炸
+  layer_init_num: [5, 5, 5, 5, 5]
+
+local_map:  
+  map_sliding_en: false     #是否启用局部地图滑动
+  half_map_size: 100
+  sliding_thresh: 8
+
+uav:
+  imu_rate_odom: false      #是否以 IMU 频率发布里程计
+  gravity_align_en: true    #是否进行重力对齐，建议开启
+
+publish:
+  dense_map_en: true         #是否发布稠密点云地图
+  pub_effect_point_en: false #是否发布有效点云（可用于调试匹配效果）
+  pub_plane_en: false        #是否发布点云平面（可用于调试点云特征提取效果）
+  pub_scan_num: 1            #每隔多少帧发布一次点云地图
+  blind_rgb_points: 0.0      #RGB点云盲区距离，小于该距离的点不发布
+
+evo:
+  seq_name: "CBD_Building_01"
+  pose_output_en: false
+
+pcd_save:
+  pcd_save_en: true            #是否保存点云文件
+  colmap_output_en: false # need to set interval = -1
+  filter_size_pcd: 0.15        #保存点云体素滤波大小
+  interval: -1
+  # how many LiDAR frames saved in each pcd file;
+  # -1 : all frames will be saved in ONE pcd file, may lead to memory crash when having too much frames.
